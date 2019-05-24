@@ -1,0 +1,2 @@
+To start the backend, at directory perfect-party-backend, run ‘PORT=3001 node ./bin/www’
+
