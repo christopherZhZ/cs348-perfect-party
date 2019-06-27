@@ -1,0 +1,102 @@
+CREATE DATABASE perfect_party_db;
+
+CREATE TABLE Client(
+	ClientID int NOT NULL,
+	FName varchar(64) NOT NULL,
+	LName varchar(64) NOT NULL,
+	Email varchar(64),
+	Active boolean DEFAULT 1,
+	PRIMARY KEY (ClientID)
+);
+
+CREATE TABLE Event(
+	EventID int NOT NULL,
+	ClientID int NOT NULL,
+	TypeID int NOT NULL,
+	Budget decimal(20,2) NOT NULL,
+	EventDate date,
+	VenueID int NOT NULL,
+	NumInvitees int DEFAULT 0,
+	PRIMARY KEY (EventID)
+);
+
+CREATE TABLE EventType(
+	TypeID int NOT NULL,
+	TypeName varchar(64) NOT NULL,
+	BasePrice decimal(20,2) NOT NULL,
+	Active boolean DEFAULT 1,
+	PRIMARY KEY (TypeID)
+);
+
+CREATE TABLE Supplier(
+	SupplierID int NOT NULL,
+	Name varchar(64) NOT NULL,
+	OfferedType enum('food','decors','host','entertainment','other'),
+	PRIMARY KEY (SupplierID)
+);
+
+CREATE TABLE Venue(
+	VenueID int NOT NULL,
+  Name varchar(64) NOT NULL,
+  Address varchar(128) NOT NULL,
+  Price decimal(20,2) NOT NULL,
+  Active boolean DEFAULT 1,
+  PRIMARY KEY (VenueID)
+);
+
+CREATE TABLE Payment(
+	EventID int NOT NULL,
+	Total decimal(20,2) NOT NULL
+);
+
+CREATE TABLE PayItem(
+	ItemID int NOT NULL,
+	ItemName varchar(64),
+	ItemType enum('food','decors','host','entertainment','other'),
+	ItemPrice decimal(20,2),
+	SupplierID int NOT NULL,
+	Active boolean DEFAULT 1,
+	PRIMARY KEY (ItemID)
+);
+
+CREATE TABLE ItemSelectRecord(
+	EventID int NOT NULL,
+	ItemID int NOT NULL,
+	Amount int NOT NULL DEFAULT 0
+);
+
+ALTER TABLE Event ADD FOREIGN KEY (ClientID)
+	REFERENCES Client
+	ON DELETE SET NULL
+	ON UPDATE CASCADE;
+
+ALTER TABLE Event ADD FOREIGN KEY (VenueID)
+	REFERENCES Venue 
+	ON DELETE SET NULL 
+	ON UPDATE CASCADE;
+
+ALTER TABLE Event ADD FOREIGN KEY (TypeID)
+	REFERENCES EventType 
+	ON DELETE SET NULL
+	ON UPDATE CASCADE;
+
+ALTER TABLE Payment ADD FOREIGN KEY (EventID) 
+	REFERENCES Event 
+	ON DELETE CASCADE
+	ON UPDATE CASCADE;
+
+ALTER TABLE PayItem ADD FOREIGN KEY (SupplierID) 
+	REFERENCES Supplier 
+	ON DELETE SET NULL 
+	ON UPDATE CASCADE;
+
+ALTER TABLE ItemSelectRecord ADD FOREIGN KEY (EventID) 
+	REFERENCES Event 
+	ON DELETE CASCADE
+	ON UPDATE CASCADE;
+
+ALTER TABLE ItemSelectRecord ADD FOREIGN KEY (ItemID) 
+	REFERENCES PayItem 
+	ON DELETE SET NULL 
+	ON UPDATE CASCADE;
+
