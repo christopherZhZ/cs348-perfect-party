@@ -15,20 +15,13 @@ connection.connect((err) => {
 
 // ---------------------------------
 
-router.get('/client/list', (req, res, next) => {
-    let statement = "SELECT id, fname, lname, email FROM client";
+router.get('/event/list', (req, res, next) => {
+    let statement =
+        "SELECT CONCAT(c.FName,c.LName) as Name, t.TypeName, Budget, v.Name, v.Address, EventDate, NumInvitees" +
+        "FROM Client c, Event e, EventType t, Venue v" +
+        "WHERE c.ClientID=e.ClientID AND e.TypeID=t.TypeID AND v.VenueID=e.VenueID";
     connection.query(statement, (err, results, fields) => {
         if (err) throw err;
-        res.send(results);
-    });
-});
-
-router.get('/client/listByFname', (req, res, next) => {
-	const { fname } = req.body;
-	const statement = "SELECT id, fname, lname, email FROM client " +
-        `WHERE fname LIKE '%${fname}%'`;
-	connection.query(statement, (err, results, fields) => {
-	    if (err) throw err;
         res.send(results);
     });
 });
