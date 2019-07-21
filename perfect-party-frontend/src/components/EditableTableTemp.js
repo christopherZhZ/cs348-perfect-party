@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Input, Divider, Form, Tag } from 'antd';
 import { ObjSetAll } from "../utils/utils";
+import styles from './EditableTable.less';
 
 const EditableContext = React.createContext();
 const EditableRow = ({ form, index, ...props }) => (

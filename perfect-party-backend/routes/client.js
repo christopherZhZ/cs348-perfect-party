@@ -33,6 +33,17 @@ router.get('/client/listByFname', (req, res, next) => {
     });
 });
 
+router.post('./client/add', (req, res, next) => {
+    const { fname, lname, email } = req.body;
+    const stmt = `INSERT INTO client(fname, lname, email) `
+        +`VALUES(${mysql.escape(fname)}, ${mysql.escape(lname)}, ${mysql.escape(email)})`;
+    connection.query(stmt, (err, results, fields)) => {
+        if (err) throw err;
+        console.log("DB: client added!")
+    }
+    res.send({ status: 'SUCCESS' });
+});
+
 // TODO: add more
 
 module.exports = router;
