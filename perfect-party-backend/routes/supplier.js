@@ -17,37 +17,38 @@ connection.connect((err) => {
 // ---------------------------------
 
 router.post('/list', (req, res, next) => {
-    let stmt = "SELECT clientid, fname, lname, email FROM client WHERE active = TRUE";
-    console.log("client/list: ", stmt);
+    let stmt = "SELECT supplierid, name, offeredtype, tel FROM supplier GROUP BY supplierid ORDER BY supplierid";
+    console.log("supplier/list: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             console.log("[!]", err);
             res.send({status: 'FAIL'});
         } else {
-            res.send({results, status: 'SUCCESS'});
+            res.send({results, status:'SUCCESS'});
         }
     });
 });
 
 function whereClause(req, res, next) {
-    const {fname, lname, email} = req.body;
-    let str = "WHERE active = TRUE ";
-    if (fname !== null) {
-        str += `AND fname LIKE ${mysql.escape('%' + fname + '%')} `;
+    const {name, offeredtype} = req.body;
+    let str = "WHERE";
+    if (name !== null) {
+        str += ` name LIKE ${mysql.escape('%' + name + '%')} `;
     }
-    if (lname !== null) {
-        str += `AND lname LIKE ${mysql.escape('%' + lname + '%')} `;
+    if (offeredtype !== null) {
+        if (name !== null) {
+            str += " AND ";
+        }
+        str += ` offeredtype = ${mysql.escape(offeredtype)}`;
     }
-    if (email !== null) {
-        str += `AND email LIKE ${mysql.escape('%' + email + '%')}`;
-    }
+    if (str === "WHERE") return "";
     return str;
 }
 
 router.post('/listBySearch', (req, res, next) => {
     let where = whereClause(req, res, next);
-    const stmt = "SELECT clientid, fname, lname, email FROM client " + where;
-    console.log("client/listBySearch: ", stmt);
+    const stmt = "SELECT supplierid, name, offeredtype, tel FROM supplier " + where;
+    console.log("supplier/listBySearch: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             console.log("[!]", err);
@@ -59,56 +60,56 @@ router.post('/listBySearch', (req, res, next) => {
 });
 
 router.post('/add', (req, res, next) => {
-    const {fname, lname, email} = req.body;
-    const stmt = `INSERT INTO client(fname, lname, email) `
-        + `VALUES(${mysql.escape(fname)}, ${mysql.escape(lname)}, ${mysql.escape(email)})`;
-    console.log("client/add: ", stmt);
+    const {name, offeredtype, tel} = req.body;
+    const stmt = `INSERT INTO supplier(name, offeredtype, tel) `
+        + `VALUES(${mysql.escape(name)}, ${mysql.escape(offeredtype)}, ${mysql.escape(tel)})`;
+    console.log("supplier/add: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             if (err.code === "ER_DUP_ENTRY") {
-                res.send({status: 'DUP-EMAIL'});
+                res.send({status: 'DUP-SUPPLIERNAME'});
             } else {
                 console.log("[!]", err);
                 res.send({status: 'FAIL'});
             }
         } else {
-            console.log("DB: client added!");
+            console.log("DB: supplier added!");
             res.send({status: 'SUCCESS'});
         }
     });
 });
 
 router.post('/update', (req, res, next) => {
-    const { fname, lname, clientid, email } = req.body;
-    const stmt = `UPDATE client SET `
-        + `fname = ${mysql.escape(fname)}, lname = ${mysql.escape(lname)}, email = ${mysql.escape(email)} `
-        + `WHERE clientid = ${mysql.escape(clientid)}`;
-    console.log("client/update: ", stmt);
+    const {supplierid, name, offeredtype, tel} = req.body;
+    const stmt = `UPDATE supplier SET `
+        + `name = ${mysql.escape(name)}, offeredtype = ${mysql.escape(offeredtype)}, tel = ${mysql.escape(tel)} `
+        + `WHERE supplierid = ${mysql.escape(supplierid)}`;
+    console.log("supplier/delete: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             if (err.code === "ER_DUP_ENTRY") {
-                res.send({status: 'DUP-EMAIL'});
+                res.send({status: 'DUP-SUPPLIERNAME'});
             } else {
                 console.log("[!]", err);
                 res.send({status: 'FAIL'});
             }
         } else {
-            console.log("DB: client updated!");
+            console.log("DB: supplier updated!");
             res.send({status: 'SUCCESS'});
         }
     });
 });
 
 router.post('/delete', (req, res, next) => {
-    const { clientid } = req.body;
-    const stmt = `UPDATE client SET active = FALSE WHERE clientid = ${mysql.escape(clientid)}`;
-    console.log("client/delete: ", stmt);
+    const {supplierid} = req.body;
+    const stmt = `DELETE FROM supplier WHERE supplierid = ${mysql.escape(supplierid)}`;
+    console.log("supplier/delete: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             console.log("[!]", err);
             res.send({status: 'FAIL'});
         } else {
-            console.log("DB: client deleted!");
+            console.log("DB: supplier deleted!");
             res.send({status: 'SUCCESS'});
         }
     });

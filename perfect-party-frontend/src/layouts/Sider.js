@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Layout, Menu, Icon, Alert } from 'antd';
+import { Layout, Menu, Icon, Alert, Button } from 'antd';
 import router from 'umi/router';
 import styles from './Sider.less';
 
@@ -8,50 +8,28 @@ const { SubMenu } = Menu;
 
 class SiderView extends PureComponent {
 
-  onMenuClick = ({ key }) => {// .
+  onMenuClick = ({ key }) => {
     router.push(`/perfectparty/${key}`);
-    console.log('KEY',key);// .
-/*
-    const { dispatch } = this.props;
-    if (key === 'all-notes') {
-      dispatch({
-        type: 'note/getNoteListByUser',
-      });
-    } else if (key.startsWith('nb-')) {
-      const notebookid = key.split('nb-')[1];
-      dispatch({
-        type: 'notebook/getNotebook',
-        payload: { notebookid },
-      }).then(() => {
-        dispatch({
-          type: 'note/getNoteListByNotebook',
-          payload: { notebookid },
-        });
-      });
-    } else if (key === 'shared') {
-      dispatch({
-        type: 'share/getMyShareList',
-      });
-    }
-*/
   };
 
-  onNewEventClick = () => {// .
-/*
-    const newEmptyNote = {
-      notebookid: currNotebook.id,
-      userid: getUserIdOrEmpty(),
-      title: 'untitled',
-      content: newEmptyNoteContent(),
-    };
-    dispatch({
-      type: 'note/addNote',
-      payload: newEmptyNote,
-    });
-*/
+  onNewEventClick = () => {
+    router.push(`/perfectparty/events/newform`);
   };
 
   render() {
+    const AddNoteView = (
+      <div className={styles.logo}>
+        <Button
+          type="dashed"
+          shape="round"
+          icon="plus"
+          onClick={this.onNewEventClick}
+        >
+          New Event
+        </Button>
+      </div>
+    )
+/*
     const AddNoteView = (
       <div
         className={styles.logo}
@@ -69,6 +47,7 @@ class SiderView extends PureComponent {
         />
       </div>
     );
+*/
 
     return (
       <Sider collapsible>
@@ -99,13 +78,12 @@ class SiderView extends PureComponent {
             key="priced"
             title={(
               <span>
-                <Icon type="dollar" />Fee Items
+                <Icon type="dollar" /> Fee Items
               </span>
             )}
           >
             <Menu.Item key="priced-host">Host</Menu.Item>
             <Menu.Item key="priced-food">Food</Menu.Item>
-            <Menu.Item key="priced-beverage">Beverage</Menu.Item>
             <Menu.Item key="priced-decor">Decoration</Menu.Item>
             <Menu.Item key="priced-entertainment">Entertainment</Menu.Item>
             <Menu.Item key="priced-other">Other</Menu.Item>

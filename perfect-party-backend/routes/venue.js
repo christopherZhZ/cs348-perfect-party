@@ -17,8 +17,8 @@ connection.connect((err) => {
 // ---------------------------------
 
 router.post('/list', (req, res, next) => {
-    let stmt = "SELECT clientid, fname, lname, email FROM client WHERE active = TRUE";
-    console.log("client/list: ", stmt);
+    let stmt = "SELECT venueid, name, address, price FROM venue WHERE active = TRUE";
+    console.log("venue/list: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             console.log("[!]", err);
@@ -30,85 +30,85 @@ router.post('/list', (req, res, next) => {
 });
 
 function whereClause(req, res, next) {
-    const {fname, lname, email} = req.body;
+    const {name, address, price} = req.body;
     let str = "WHERE active = TRUE ";
-    if (fname !== null) {
-        str += `AND fname LIKE ${mysql.escape('%' + fname + '%')} `;
+    if (name !== null) {
+        str += `AND name LIKE ${mysql.escape('%' + name + '%')} `;
     }
-    if (lname !== null) {
-        str += `AND lname LIKE ${mysql.escape('%' + lname + '%')} `;
+    if (address !== null) {
+        str += `AND address LIKE ${mysql.escape('%' + address + '%')} `;
     }
-    if (email !== null) {
-        str += `AND email LIKE ${mysql.escape('%' + email + '%')}`;
+    if (price !== null) {
+        str += `AND price <= ${mysql.escape(price)}`;
     }
     return str;
 }
 
 router.post('/listBySearch', (req, res, next) => {
     let where = whereClause(req, res, next);
-    const stmt = "SELECT clientid, fname, lname, email FROM client " + where;
-    console.log("client/listBySearch: ", stmt);
+    const stmt = "SELECT venueid, name, address, price FROM venue " + where;
+    console.log("venue/listBySearch: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             console.log("[!]", err);
             res.send({status: 'FAIL'});
         } else {
-            res.send({results, status: 'SUCCESS'});
+            res.send(results);
         }
     });
 });
 
 router.post('/add', (req, res, next) => {
-    const {fname, lname, email} = req.body;
-    const stmt = `INSERT INTO client(fname, lname, email) `
-        + `VALUES(${mysql.escape(fname)}, ${mysql.escape(lname)}, ${mysql.escape(email)})`;
-    console.log("client/add: ", stmt);
+    const {name, address, price} = req.body;
+    const stmt = `INSERT INTO venue(name, address, price) `
+        + `VALUES(${mysql.escape(name)}, ${mysql.escape(address)}, ${mysql.escape(price)})`;
+    console.log("venue/add: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             if (err.code === "ER_DUP_ENTRY") {
-                res.send({status: 'DUP-EMAIL'});
+                res.send({status: 'DUP-ADDRESS'});
             } else {
                 console.log("[!]", err);
                 res.send({status: 'FAIL'});
             }
         } else {
-            console.log("DB: client added!");
+            console.log("DB: venue added!");
             res.send({status: 'SUCCESS'});
         }
     });
 });
 
 router.post('/update', (req, res, next) => {
-    const { fname, lname, clientid, email } = req.body;
-    const stmt = `UPDATE client SET `
-        + `fname = ${mysql.escape(fname)}, lname = ${mysql.escape(lname)}, email = ${mysql.escape(email)} `
-        + `WHERE clientid = ${mysql.escape(clientid)}`;
-    console.log("client/update: ", stmt);
+    const {name, address, venueid, price} = req.body;
+    const stmt = `UPDATE venue SET `
+        + `name = ${mysql.escape(name)}, address = ${mysql.escape(address)}, price = ${mysql.escape(price)} `
+        + `WHERE venueid = ${mysql.escape(venueid)}`;
+    console.log("venue/update: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             if (err.code === "ER_DUP_ENTRY") {
-                res.send({status: 'DUP-EMAIL'});
+                res.send({status: 'DUP-ADDRESS'});
             } else {
                 console.log("[!]", err);
                 res.send({status: 'FAIL'});
             }
         } else {
-            console.log("DB: client updated!");
+            console.log("DB: venue updated!");
             res.send({status: 'SUCCESS'});
         }
     });
 });
 
 router.post('/delete', (req, res, next) => {
-    const { clientid } = req.body;
-    const stmt = `UPDATE client SET active = FALSE WHERE clientid = ${mysql.escape(clientid)}`;
-    console.log("client/delete: ", stmt);
+    const {venueid} = req.body;
+    const stmt = `UPDATE venue SET active = FALSE WHERE venueid = ${mysql.escape(venueid)}`;
+    console.log("venue/delete: ", stmt);
     connection.query(stmt, (err, results, fields) => {
         if (err) {
             console.log("[!]", err);
             res.send({status: 'FAIL'});
         } else {
-            console.log("DB: client deleted!");
+            console.log("DB: venue deleted!");
             res.send({status: 'SUCCESS'});
         }
     });
